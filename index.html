@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cement Additive Variable-Cost Economics — Best Result Standalone Calculator</title>
+<style>
+  :root { --ink:#172033; --muted:#5c667a; --line:#ccd3df; --input:#eaf3fb; --accent:#0a5ea8; --accent-soft:#eef6fd; --good:#e8f5ea; --good-strong:#cfeeda; --good-ink:#155f35; --bad:#fdeaea; --warn:#fff5d9; --gold:#d7a723; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; font:14px/1.45 Arial, Helvetica, sans-serif; color:var(--ink); background:#f6f8fb; }
+  .wrap { max-width:1320px; margin:auto; }
+  h1 { margin:0 0 6px; font-size:25px; }
+  h2 { margin:26px 0 10px; font-size:18px; }
+  .subtitle { color:var(--muted); margin-bottom:18px; }
+  .grid { display:grid; grid-template-columns:420px 1fr; gap:18px; align-items:start; }
+  .card { background:white; border:1px solid var(--line); border-radius:10px; padding:16px; box-shadow:0 2px 8px rgba(20,35,60,.05); }
+  table { border-collapse:collapse; width:100%; }
+  th, td { border:1px solid var(--line); padding:7px 8px; text-align:right; vertical-align:middle; }
+  th { background:#edf1f6; font-weight:700; }
+  td:first-child, th:first-child { text-align:left; }
+  input, select { width:100%; padding:5px 6px; border:1px solid #9eb4c8; border-radius:4px; background:var(--input); text-align:right; font:inherit; }
+  input[type=text] { text-align:left; }
+  .unit { color:var(--muted); white-space:nowrap; }
+  .output { font-variant-numeric:tabular-nums; }
+  .good { background:var(--good); font-weight:700; }
+  .bad { background:var(--bad); font-weight:700; }
+  .neutral { background:#f4f6f9; font-weight:700; }
+  .warn { background:var(--warn); }
+  .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:14px; }
+  .metric { border:1px solid var(--line); border-radius:8px; padding:11px; background:#fff; }
+  .metric b { display:block; font-size:18px; margin-top:3px; }
+  .metric span { color:var(--muted); font-size:12px; }
+  .notes { color:#344054; }
+  .notes li { margin:5px 0; }
+  .small { font-size:12px; color:var(--muted); }
+  .source-table td:nth-child(2), .source-table td:nth-child(3), .source-table td:nth-child(4) { text-align:center; }
+  .footer { margin-top:18px; font-size:12px; color:var(--muted); }
+  .hidden-gypsum-row { display:none; }
+
+  /* Calculated cost emphasis */
+  #scenarioTable tr.key-cost-row > td { background:var(--accent-soft); }
+  #scenarioTable tr.key-cost-row > td:first-child {
+    color:#114f7a; font-weight:700; border-left:4px solid #7aaed5;
+  }
+  #scenarioTable tr.key-cost-row .output { font-weight:700; }
+  #scenarioTable tr.decision-row > td { background:#e8eff8; font-weight:700; }
+  #scenarioTable tr.decision-row > td:first-child { color:#183f68; border-left:4px solid var(--accent); }
+  #scenarioTable tr.primary-result-row > td { font-size:14px; }
+
+  /* Automatically selected best scenario */
+  #scenarioTable .winner-col {
+    background:linear-gradient(135deg,#f2fbf4 0%,#dcf2e3 100%) !important;
+    box-shadow:inset 2px 0 #3da767, inset -2px 0 #3da767;
+    position:relative;
+  }
+  #scenarioTable thead .winner-col {
+    color:var(--good-ink); border-top:3px solid #3da767;
+  }
+  #scenarioTable tbody tr:last-child .winner-col { border-bottom:3px solid #3da767; }
+  #scenarioTable .winner-col input { background:#f5fff7; border-color:#65b982; font-weight:700; }
+  .winner-badge {
+    display:none; margin:6px auto 0; width:max-content; padding:3px 8px;
+    border-radius:999px; background:#1f8b4c; color:#fff; font-size:10px;
+    line-height:1.2; letter-spacing:.08em; font-weight:800; text-transform:uppercase;
+    box-shadow:0 2px 5px rgba(20,95,53,.18);
+  }
+  .winner-col .winner-badge { display:block; }
+
+  .best-result-card {
+    margin-top:14px; border:1px solid #5db77b; border-left:7px solid #238a4d;
+    border-radius:10px; padding:15px 16px; background:linear-gradient(110deg,#f5fff7 0%,#e3f6e8 72%,#fff9e7 100%);
+    box-shadow:0 4px 14px rgba(31,139,76,.12); display:grid;
+    grid-template-columns:auto 1fr auto; gap:14px; align-items:center;
+  }
+  .best-result-icon {
+    width:44px; height:44px; border-radius:50%; display:grid; place-items:center;
+    background:#fff; border:2px solid var(--gold); color:#b78300; font-size:23px;
+    box-shadow:0 2px 8px rgba(183,131,0,.14);
+  }
+  .best-result-kicker { color:var(--good-ink); font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+  .best-result-title { margin-top:2px; font-size:18px; font-weight:800; color:#134f2d; }
+  .best-result-detail { margin-top:3px; color:#2f5f42; }
+  .best-result-number { text-align:right; white-space:nowrap; }
+  .best-result-number b { display:block; font-size:22px; color:#155f35; }
+  .best-result-number span { color:#477158; font-size:11px; }
+  .best-result-card.reference-winner { border-color:#77a9d1; border-left-color:var(--accent); background:linear-gradient(110deg,#f7fbff 0%,#e6f1fb 75%,#fff9e7 100%); }
+  .best-result-card.reference-winner .best-result-kicker,
+  .best-result-card.reference-winner .best-result-title,
+  .best-result-card.reference-winner .best-result-number b { color:#164e7a; }
+  .best-result-card.reference-winner .best-result-detail,
+  .best-result-card.reference-winner .best-result-number span { color:#456782; }
+
+  @media (max-width:1000px){ .grid{grid-template-columns:1fr;} .metrics{grid-template-columns:1fr 1fr;} }
+  @media (max-width:700px){ .best-result-card{grid-template-columns:auto 1fr;} .best-result-number{grid-column:1/-1;text-align:left;padding-left:58px;} }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cement Additive Variable-Cost Economics</h1>
+  <div class="subtitle">EU / Germany-oriented June 2026 base case. Variable costs only; capacity contribution margin and fixed-cost absorption are excluded. Core calculation logic follows the original model, including throughput-adjusted variable R&amp;M.</div>
+
+  <div class="grid">
+    <div class="card">
+      <h2 style="margin-top:0">Plant and cost assumptions</h2>
+      <table>
+        <tr><td>Mill main drive</td><td><input id="millPower" type="number" value="1600" step="10"></td><td class="unit">kW</td></tr>
+        <tr><td>Ancillaries</td><td><input id="ancillaries" type="number" value="400" step="10"></td><td class="unit">kW</td></tr>
+        <tr><td>Total power</td><td class="output neutral" id="totalPower"></td><td class="unit">kW</td></tr>
+        <tr><td>Electricity</td><td><input id="electricity" type="number" value="0.12" step="0.005"></td><td class="unit">€/kWh</td></tr>
+        <tr><td>Variable grinding R&amp;M</td><td><input id="rm" type="number" value="1.00" step="0.05"></td><td class="unit">€/t cement</td></tr>
+        <tr><td>Clinker variable cost, excl. CO₂</td><td><input id="clinkerCost" type="number" value="50" step="1"></td><td class="unit">€/t</td></tr>
+        <tr><td>Limestone filler</td><td><input id="limestoneCost" type="number" value="12" step="1"></td><td class="unit">€/t</td></tr>
+        <tr><td>GGBFS / slag</td><td><input id="slagCost" type="number" value="55" step="1"></td><td class="unit">€/t</td></tr>
+        <tr class="hidden-gypsum-row"><td>Gypsum</td><td><input id="gypsumCost" type="number" value="20" step="1"></td><td class="unit">€/t</td></tr>
+        <tr><td>EUA / CO₂ price</td><td><input id="co2Price" type="number" value="80" step="1"></td><td class="unit">€/tCO₂</td></tr>
+        <tr><td>Clinker direct emissions</td><td><input id="co2Factor" type="number" value="790" step="5"></td><td class="unit">kgCO₂/t clinker</td></tr>
+        <tr><td>CO₂ economic exposure</td><td><input id="co2Exposure" type="number" value="100" min="0" max="100" step="5"></td><td class="unit">%</td></tr>
+        <tr><td>Annual clinker basis</td><td><input id="annualClinker" type="number" value="200000" step="1000"></td><td class="unit">t/year</td></tr>
+      </table>
+      <p class="small">CO₂ exposure is set to 100% for marginal opportunity-cost economics. Reduce it only for a cash-budget view where avoided allowances have no realizable value.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Reference and additive scenarios</h2>
+      <table id="scenarioTable">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th><span>Reference</span><span id="badge0" class="winner-badge">Best for Economics</span></th>
+            <th><span>Scenario 1</span><span id="badge1" class="winner-badge">Best for Economics</span></th>
+            <th><span>Scenario 2</span><span id="badge2" class="winner-badge">Best for Economics</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Scenario</td><td><input id="name0" type="text" value="No additive"></td><td><input id="name1" type="text" value="Grinding aid"></td><td><input id="name2" type="text" value="Q-improver + 5% slag"></td></tr>
+          <tr><td>Additive price, €/t</td><td><input id="add0" type="number" value="0"></td><td><input id="add1" type="number" value="1200"></td><td><input id="add2" type="number" value="2000"></td></tr>
+          <tr><td>Dosage, g/t cement</td><td><input id="dose0" type="number" value="0"></td><td><input id="dose1" type="number" value="300"></td><td><input id="dose2" type="number" value="1000"></td></tr>
+          <tr><td>Limestone, %</td><td><input id="lime0" type="number" value="5"></td><td><input id="lime1" type="number" value="5"></td><td><input id="lime2" type="number" value="5"></td></tr>
+          <tr><td>Slag, %</td><td><input id="slag0" type="number" value="0"></td><td><input id="slag1" type="number" value="0"></td><td><input id="slag2" type="number" value="5"></td></tr>
+          <tr class="hidden-gypsum-row"><td>Gypsum, %</td><td><input id="gyp0" type="number" value="5"></td><td><input id="gyp1" type="number" value="5"></td><td><input id="gyp2" type="number" value="5"></td></tr>
+          <tr><td>Mill output, t/h</td><td><input id="tph0" type="number" value="40"></td><td><input id="tph1" type="number" value="44"></td><td><input id="tph2" type="number" value="46"></td></tr>
+          <tr><td>Clinker, %</td><td id="cl0" class="output"></td><td id="cl1" class="output"></td><td id="cl2" class="output"></td></tr>
+          <tr><td>Specific energy, kWh/t</td><td id="kwh0" class="output"></td><td id="kwh1" class="output"></td><td id="kwh2" class="output"></td></tr>
+          <tr class="key-cost-row"><td>Electricity cost, €/t</td><td id="energy0" class="output"></td><td id="energy1" class="output"></td><td id="energy2" class="output"></td></tr>
+          <tr class="key-cost-row"><td>Variable R&amp;M, €/t</td><td id="rm0" class="output"></td><td id="rm1" class="output"></td><td id="rm2" class="output"></td></tr>
+          <tr class="key-cost-row"><td>Composition cost, €/t</td><td id="comp0" class="output"></td><td id="comp1" class="output"></td><td id="comp2" class="output"></td></tr>
+          <tr class="key-cost-row"><td>CO₂ opportunity cost, €/t</td><td id="carbon0" class="output"></td><td id="carbon1" class="output"></td><td id="carbon2" class="output"></td></tr>
+          <tr class="key-cost-row"><td>Additive cost, €/t</td><td id="addCost0" class="output"></td><td id="addCost1" class="output"></td><td id="addCost2" class="output"></td></tr>
+          <tr class="decision-row primary-result-row"><td>Total variable cost, €/t</td><td id="total0" class="output neutral"></td><td id="total1" class="output"></td><td id="total2" class="output"></td></tr>
+          <tr class="decision-row primary-result-row"><td>Net saving vs reference, €/t</td><td id="saving0" class="output neutral"></td><td id="saving1" class="output"></td><td id="saving2" class="output"></td></tr>
+          <tr class="decision-row"><td>Annual saving on reference volume, €</td><td id="annual0" class="output neutral"></td><td id="annual1" class="output"></td><td id="annual2" class="output"></td></tr>
+          <tr class="decision-row"><td>Return on additive spend, %</td><td id="roi0" class="output neutral"></td><td id="roi1" class="output"></td><td id="roi2" class="output"></td></tr>
+        </tbody>
+      </table>
+      <div id="bestResultCard" class="best-result-card" aria-live="polite">
+        <div class="best-result-icon" aria-hidden="true">★</div>
+        <div>
+          <div id="bestResultKicker" class="best-result-kicker">Best for Economics</div>
+          <div id="bestResultTitle" class="best-result-title"></div>
+          <div id="bestResultDetail" class="best-result-detail"></div>
+        </div>
+        <div class="best-result-number">
+          <b id="bestResultSaving"></b>
+          <span id="bestResultAnnual"></span>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><span>Reference cement volume</span><b id="annualVolume"></b><span>t/year from annual clinker basis</span></div>
+        <div class="metric"><span>Scenario 1 break-even electricity</span><b id="beElec1"></b><span>€/kWh</span></div>
+        <div class="metric"><span>Scenario 2 break-even EUA</span><b id="beCo22"></b><span>€/tCO₂, all else unchanged</span></div>
+        <div class="metric"><span>Scenario 2 break-even additive price</span><b id="beAdd2"></b><span>€/t additive at entered dosage</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h2 style="margin-top:0">Source-based ranges and base-case selection</h2>
+    <table class="source-table">
+      <thead><tr><th>Input</th><th>Low</th><th>Base used</th><th>High</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td>Electricity, €/kWh</td><td>0.10</td><td>0.12</td><td>0.18</td><td>Large energy-intensive German users with reductions around 0.105–0.117; EU non-household average 0.184 in H2 2025.</td></tr>
+        <tr><td>Clinker variable cost excl. CO₂, €/t</td><td>40</td><td>50</td><td>60</td><td>Analyst estimate. Public historical benchmarks show German clinker production cost around €37/t in 2020 and EU cement production cost €46–58/t excluding CO₂ in 2021.</td></tr>
+        <tr><td>GGBFS, €/t</td><td>50</td><td>55</td><td>65</td><td>Q1 2026 indications: Germany USD 63/t and France USD 54/t; local freight and grinding status are decisive.</td></tr>
+        <tr><td>Limestone filler, €/t</td><td>8</td><td>12</td><td>20</td><td>Plant-specific quarry/handling estimate; validate against internal transfer price.</td></tr>
+        <tr class="hidden-gypsum-row"><td>Gypsum, €/t</td><td>12</td><td>20</td><td>30</td><td>Retained as a hidden compatibility field. The original calculator assumes 5% gypsum in the mass balance but does not cost gypsum separately.</td></tr>
+        <tr><td>EUA, €/tCO₂</td><td>74</td><td>80</td><td>90</td><td>2026 benchmark traded around €74 in late April; about €80.6 in June and analyst 2026 average forecast €80.61.</td></tr>
+        <tr><td>Gross clinker emissions, tCO₂/t</td><td>0.785</td><td>0.790</td><td>0.820</td><td>EU27 gross grey-clinker emissions in 2023 were approximately 0.785 tCO₂/t; 0.79 used as the base.</td></tr>
+        <tr><td>Variable grinding R&amp;M, €/t cement</td><td>0.8</td><td>1.0</td><td>1.5</td><td>Range stated in the original calculator. Scenario R&amp;M is scaled by reference output ÷ scenario output.</td></tr>
+      </tbody>
+    </table>
+    <p class="small">Use the editable inputs above for plant-specific sensitivities. The displayed economics recalculate immediately when any visible input changes.</p>
+  </div>
+
+  <div class="card notes" style="margin-top:18px">
+    <h2 style="margin-top:0">Calculation controls</h2>
+    <ul>
+      <li>Additive cost = additive price × dosage / 1,000,000, rounded to two decimals before net and annual savings are calculated, matching the original calculator.</li>
+      <li>Specific energy = (main drive + ancillaries) / mill output. Power is assumed constant at the entered 2,000 kW.</li>
+      <li>Composition cost follows the original calculator: clinker, limestone and slag are costed; the hidden gypsum percentage remains in the mass balance, so clinker percentage is the residual to 100%, but gypsum is not costed separately.</li>
+      <li>CO₂ value = clinker fraction × clinker emissions factor × EUA price × exposure. This is a marginal opportunity-cost method.</li>
+      <li>Variable R&amp;M follows the original calculator: scenario R&amp;M per tonne = reference R&amp;M × reference mill output ÷ scenario mill output. This converts fewer operating hours for the same production volume into a lower variable R&amp;M cost per tonne.</li>
+      <li>Annual saving uses the same reference cement volume, derived from the annual clinker basis. Extra saleable tonnes from higher mill capacity are intentionally not monetized.</li>
+    </ul>
+  </div>
+
+  <div class="footer">Prepared as an auditable screening model. Replace all public benchmarks with plant invoices, actual power curves, verified material moisture/grindability, internal clinker transfer cost, and installation-level EU ETS data before investment approval.</div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const num = id => Number($(id).value) || 0;
+const fmt = (x,d=2) => Number.isFinite(x) ? x.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
+const set = (id,x,d=2) => $(id).textContent = fmt(x,d);
+function paint(id,value){ const el=$(id); el.classList.remove('good','bad','neutral'); el.classList.add(value>1e-9?'good':value<-1e-9?'bad':'neutral'); }
+function recalc(){
+  const p = num('millPower') + num('ancillaries');
+  set('totalPower',p,0);
+  const E=num('electricity'), rm=num('rm'), cCost=num('clinkerCost'), lCost=num('limestoneCost'), sCost=num('slagCost'), gCost=num('gypsumCost');
+  const co2P=num('co2Price'), ef=num('co2Factor')/1000, exposure=num('co2Exposure')/100;
+  const annualClinker=num('annualClinker');
+  const refTph=num('tph0');
+  const rows=[];
+  for(let i=0;i<3;i++){
+    const add=num('add'+i), dose=num('dose'+i), lime=num('lime'+i)/100, slag=num('slag'+i)/100, gyp=num('gyp'+i)/100, tph=num('tph'+i);
+    const clinker=1-lime-slag-gyp;
+    const valid=clinker>=0 && tph>0;
+    const kwh=valid?p/tph:NaN;
+    const energy=kwh*E;
+    // Match the original calculator:
+    // scenario R&M per tonne = reference R&M × reference output / scenario output.
+    const scenarioRm=valid && refTph>0 ? rm*refTph/tph : NaN;
+    // Match the original calculator: 5% gypsum is retained in the clinker balance,
+    // but no separate gypsum material cost is added to composition cost.
+    const comp=valid?clinker*cCost+lime*lCost+slag*sCost:NaN;
+    const carbon=valid?clinker*ef*co2P*exposure:NaN;
+    // Match the original calculator by rounding additive cost to euro cents
+    // before net saving and annual saving are calculated.
+    const addCost=Math.round((add*dose/1_000_000)*100)/100;
+    const total=energy+scenarioRm+comp+carbon+addCost;
+    rows.push({clinker,kwh,energy,rm:scenarioRm,comp,carbon,addCost,total,lime,slag,gyp,tph,dose,add});
+    set('cl'+i,clinker*100,1); set('kwh'+i,kwh,2); set('energy'+i,energy,2); set('rm'+i,scenarioRm,2); set('comp'+i,comp,2); set('carbon'+i,carbon,2); set('addCost'+i,addCost,2); set('total'+i,total,2);
+  }
+  const ref=rows[0];
+  const annualVolume=ref.clinker>0?annualClinker/ref.clinker:0;
+  set('annualVolume',annualVolume,0);
+  for(let i=0;i<3;i++){
+    const saving=i===0?0:ref.total-rows[i].total;
+    const annual=saving*annualVolume;
+    const roi=rows[i].addCost>0?saving/rows[i].addCost*100:0;
+    set('saving'+i,saving,2); set('annual'+i,annual,0); set('roi'+i,roi,1);
+    paint('saving'+i,saving); paint('annual'+i,annual); paint('roi'+i,roi);
+    if(i>0) paint('total'+i,saving);
+    rows[i].saving=saving; rows[i].annual=annual; rows[i].roi=roi;
+  }
+
+  // Select and advertise the lowest-cost result. This updates with every input change.
+  const finiteTotals=rows.map((r,i)=>({i,total:r.total})).filter(x=>Number.isFinite(x.total));
+  const minTotal=finiteTotals.length?Math.min(...finiteTotals.map(x=>x.total)):NaN;
+  const winners=finiteTotals.filter(x=>Math.abs(x.total-minTotal)<0.005).map(x=>x.i);
+  const primaryWinner=winners.length?winners[0]:0;
+
+  document.querySelectorAll('#scenarioTable .winner-col').forEach(el=>el.classList.remove('winner-col'));
+  winners.forEach(i=>{
+    document.querySelectorAll('#scenarioTable tr').forEach(tr=>{
+      const cell=tr.children[i+1];
+      if(cell) cell.classList.add('winner-col');
+    });
+  });
+
+  const best=rows[primaryWinner];
+  const bestName=($('name'+primaryWinner).value || ['Reference','Scenario 1','Scenario 2'][primaryWinner]).trim();
+  const card=$('bestResultCard');
+  card.classList.toggle('reference-winner',primaryWinner===0);
+  $('bestResultKicker').textContent=winners.length>1?'Joint Best Result':'Best for Economics';
+  $('bestResultTitle').textContent=(primaryWinner===0?'Reference — ':'Scenario '+primaryWinner+' — ')+bestName;
+  if(primaryWinner===0){
+    $('bestResultDetail').textContent='Lowest variable cost at the current assumptions. The additive scenarios do not currently deliver a lower cost.';
+    $('bestResultSaving').textContent=fmt(best.total,2)+' €/t';
+    $('bestResultAnnual').textContent='lowest total variable cost';
+  } else {
+    $('bestResultDetail').textContent='Lowest total variable cost: '+fmt(best.total,2)+' €/t. Automatically selected from all scenarios.';
+    $('bestResultSaving').textContent='+'+fmt(best.saving,2)+' €/t';
+    $('bestResultAnnual').textContent='Annual economic benefit: '+fmt(best.annual,0)+' €';
+  }
+  if(winners.length>1){
+    const tied=winners.map(i=>($('name'+i).value || ('Scenario '+i)).trim()).join(' / ');
+    $('bestResultDetail').textContent='Equal lowest cost within €0.005/t: '+tied+'.';
+  }
+
+  const dKwh1=ref.kwh-rows[1].kwh;
+  const nonElecSaving1=(ref.comp+ref.carbon+ref.rm)-(rows[1].comp+rows[1].carbon+rows[1].rm)-rows[1].addCost;
+  const beElec=dKwh1!==0?-nonElecSaving1/dKwh1:NaN;
+  set('beElec1',beElec,4);
+  const dCarbonFactor=(ref.clinker-rows[2].clinker)*ef*exposure;
+  const savingExCarbon=(ref.energy+ref.comp+ref.rm)-(rows[2].energy+rows[2].comp+rows[2].rm)-rows[2].addCost;
+  const beCo2=dCarbonFactor>0?-savingExCarbon/dCarbonFactor:NaN;
+  set('beCo22',beCo2,2);
+  const grossBeforeAdd=ref.total-(rows[2].total-rows[2].addCost);
+  const beAdd=rows[2].dose>0?grossBeforeAdd*1_000_000/rows[2].dose:NaN;
+  set('beAdd2',beAdd,0);
+}
+document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',recalc));
+recalc();
+</script>
+</body>
+</html>
